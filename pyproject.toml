@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kalja"
+version = "0.1.0"
+description = "Finnish-focused text mutation and human-input fuzzing"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "jburn" },
+]
+keywords = [
+    "fuzzing",
+    "text",
+    "testing",
+    "typos",
+    "unicode",
+    "finnish",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Repository = "https://github.com/jburn/kalja"
+Issues = "https://github.com/jburn/kalja/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kalja"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/uv.lock",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["kalja"]
+mypy_path = "src"
+
+[dependency-groups]
+dev = [
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
