@@ -16,6 +16,7 @@ def test_layout_contains_primary_and_shifted_characters() -> None:
     assert "A" in layout
     assert "b" in layout
     assert "B" in layout
+    assert "x" not in layout
 
 
 def test_key_returns_physical_key() -> None:
@@ -24,6 +25,16 @@ def test_key_returns_physical_key() -> None:
 
     assert layout.key("ä") is key
     assert layout.key("Ä") is key
+
+
+def test_key_raises_for_unknown_character() -> None:
+    layout = KeyboardLayout(
+        "test",
+        (Key("a", "A", 0.0, 0.0),),
+    )
+
+    with pytest.raises(KeyError):
+        layout.key("x")
 
 
 def test_empty_name_is_rejected() -> None:
@@ -39,7 +50,33 @@ def test_empty_layout_is_rejected() -> None:
         KeyboardLayout("test", ())
 
 
-def test_duplicate_character_is_rejected() -> None:
+@pytest.mark.parametrize("radius", [0.0, -0.1, -1.0])
+def test_invalid_neighbor_radius_is_rejected(radius: float) -> None:
+    with pytest.raises(ValueError):
+        KeyboardLayout(
+            "test",
+            (Key("a", "A", 0.0, 0.0),),
+            neighbor_radius=radius,
+        )
+
+
+def test_multi_character_primary_is_rejected() -> None:
+    with pytest.raises(ValueError):
+        KeyboardLayout(
+            "test",
+            (Key("ab", "A", 0.0, 0.0),),
+        )
+
+
+def test_multi_character_shifted_is_rejected() -> None:
+    with pytest.raises(ValueError):
+        KeyboardLayout(
+            "test",
+            (Key("a", "AB", 0.0, 0.0),),
+        )
+
+
+def test_duplicate_primary_character_is_rejected() -> None:
     with pytest.raises(ValueError):
         KeyboardLayout(
             "test",
@@ -48,3 +85,111 @@ def test_duplicate_character_is_rejected() -> None:
                 Key("a", "B", 1.0, 0.0),
             ),
         )
+
+
+def test_duplicate_shifted_character_is_rejected() -> None:
+    with pytest.raises(ValueError):
+        KeyboardLayout(
+            "test",
+            (
+                Key("a", "A", 0.0, 0.0),
+                Key("b", "A", 1.0, 0.0),
+            ),
+        )
+
+
+def test_duplicate_character_across_primary_and_shifted_is_rejected() -> None:
+    with pytest.raises(ValueError):
+        KeyboardLayout(
+            "test",
+            (
+                Key("a", "A", 0.0, 0.0),
+                Key("A", "B", 1.0, 0.0),
+            ),
+        )
+
+
+def test_neighboring_keys_uses_physical_distance() -> None:
+    a = Key("a", "A", 0.0, 0.0)
+    b = Key("b", "B", 1.0, 0.0)
+    c = Key("c", "C", 3.0, 0.0)
+
+    layout = KeyboardLayout(
+        "test",
+        (a, b, c),
+        neighbor_radius=1.1,
+    )
+
+    assert layout.neighboring_keys("a") == (b,)
+    assert layout.neighboring_keys("b") == (a,)
+    assert layout.neighboring_keys("c") == ()
+
+
+def test_neighboring_keys_includes_diagonal_keys_within_radius() -> None:
+    center = Key("a", "A", 0.0, 0.0)
+    diagonal = Key("b", "B", 0.5, 1.0)
+
+    layout = KeyboardLayout(
+        "test",
+        (center, diagonal),
+        neighbor_radius=1.2,
+    )
+
+    assert layout.neighboring_keys("a") == (diagonal,)
+
+
+def test_neighboring_keys_excludes_key_itself() -> None:
+    key = Key("a", "A", 0.0, 0.0)
+    layout = KeyboardLayout("test", (key,))
+
+    assert layout.neighboring_keys("a") == ()
+
+
+def test_primary_and_shifted_have_same_physical_neighbors() -> None:
+    a = Key("a", "A", 0.0, 0.0)
+    b = Key("b", "B", 1.0, 0.0)
+
+    layout = KeyboardLayout("test", (a, b))
+
+    assert layout.neighboring_keys("a") == (b,)
+    assert layout.neighboring_keys("A") == (b,)
+
+
+def test_neighbors_preserves_primary_state() -> None:
+    layout = KeyboardLayout(
+        "test",
+        (
+            Key("a", "A", 0.0, 0.0),
+            Key("b", "B", 1.0, 0.0),
+        ),
+    )
+
+    assert layout.neighbors("a") == ("b",)
+
+
+def test_neighbors_preserves_shifted_state() -> None:
+    layout = KeyboardLayout(
+        "test",
+        (
+            Key("a", "A", 0.0, 0.0),
+            Key("b", "B", 1.0, 0.0),
+        ),
+    )
+
+    assert layout.neighbors("A") == ("B",)
+
+
+def test_layout_properties() -> None:
+    keys = (
+        Key("a", "A", 0.0, 0.0),
+        Key("b", "B", 1.0, 0.0),
+    )
+    layout = KeyboardLayout(
+        "test",
+        keys,
+        neighbor_radius=1.25,
+    )
+
+    assert layout.name == "test"
+    assert layout.keys == keys
+    assert layout.neighbor_radius == 1.25
