@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from kalja.mutations import keyboard_error, transpose_chars
+from kalja.mutations import drop_chars, keyboard_error, transpose_chars
 from kalja.keyboards import FI_DESKTOP
 
 
@@ -140,3 +140,47 @@ def test_transpose_chars_handles_empty_string() -> None:
 def test_transpose_chars_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         transpose_chars("test", rate=rate)
+
+
+def test_drop_chars_rate_zero_returns_original_text() -> None:
+    text = "Missä te olette?"
+
+    assert drop_chars(text, rate=0.0, seed=42) == text
+
+
+def test_drop_chars_rate_one_returns_empty_string() -> None:
+    assert drop_chars("Missä te olette?", rate=1.0) == ""
+
+
+def test_drop_chars_is_deterministic_with_seed() -> None:
+    text = "abcdefghijklmnop"
+
+    first = drop_chars(text, rate=0.5, seed=42)
+    second = drop_chars(text, rate=0.5, seed=42)
+
+    assert first == second
+
+
+def test_drop_chars_handles_empty_string() -> None:
+    assert drop_chars("", rate=0.5, seed=42) == ""
+
+
+def test_drop_chars_handles_unicode() -> None:
+    result = drop_chars("ääö🙂漢", rate=0.5, seed=42)
+
+    assert isinstance(result, str)
+
+
+@pytest.mark.parametrize("rate", [-1.0, -0.01, 1.01, 2.0])
+def test_drop_chars_rejects_invalid_rate(rate: float) -> None:
+    with pytest.raises(ValueError):
+        drop_chars("test", rate=rate)
+
+def test_drop_chars_only_removes_characters() -> None:
+    text = "abcdef"
+
+    result = drop_chars(text, rate=0.5, seed=42)
+
+    iterator = iter(text)
+
+    assert all(char in iterator for char in result)
