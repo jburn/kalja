@@ -3,7 +3,13 @@ import random
 import pytest
 
 from kalja.keyboards import FI_DESKTOP
-from kalja.mutations import drop_chars, keyboard_error, repeat_chars, transpose_chars
+from kalja.mutations import (
+    drop_chars,
+    keyboard_error,
+    mutate_spacing,
+    repeat_chars,
+    transpose_chars,
+)
 
 
 def test_keyboard_error_rate_zero_returns_original_text() -> None:
@@ -249,3 +255,50 @@ def test_repeat_chars_only_duplicates_original_characters() -> None:
             index += 1
 
     assert index == len(result)
+
+def test_mutate_spacing_rate_zero_returns_original_text() -> None:
+    text = "Missä te olette?"
+
+    assert mutate_spacing(text, rate=0.0, seed=42) == text
+
+
+def test_mutate_spacing_is_deterministic_with_seed() -> None:
+    text = "Missä te olette?"
+
+    first = mutate_spacing(text, rate=0.5, seed=42)
+    second = mutate_spacing(text, rate=0.5, seed=42)
+
+    assert first == second
+
+
+def test_mutate_spacing_rate_one_removes_existing_spaces() -> None:
+    assert mutate_spacing("a b", rate=1.0) == "ab"
+
+def test_mutate_spacing_rate_one_inserts_between_characters() -> None:
+    assert mutate_spacing("abc", rate=1.0) == "a b c"
+
+def test_mutate_spacing_handles_empty_string() -> None:
+    assert mutate_spacing("", rate=1.0) == ""
+
+
+def test_mutate_spacing_handles_single_character() -> None:
+    assert mutate_spacing("a", rate=1.0) == "a"
+
+
+def test_mutate_spacing_does_not_add_trailing_space() -> None:
+    result = mutate_spacing("abc", rate=1.0)
+
+    assert not result.endswith(" ")
+
+@pytest.mark.parametrize("rate", [-1.0, -0.01, 1.01, 2.0])
+def test_mutate_spacing_rejects_invalid_rate(rate: float) -> None:
+    with pytest.raises(ValueError):
+        mutate_spacing("test", rate=rate)
+
+def test_mutate_spacing_preserves_tabs_and_newlines() -> None:
+    text = "a\tb\nc"
+
+    result = mutate_spacing(text, rate=1.0)
+
+    assert "\t" in result
+    assert "\n" in result

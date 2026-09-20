@@ -157,3 +157,53 @@ def repeat_chars(
         rate=rate,
         rng=rng,
     )
+
+def _mutate_spacing(
+    text: str,
+    *,
+    rate: float,
+    rng: random.Random,
+) -> str:
+    if not text:
+        return text
+
+    result: list[str] = []
+
+    for index, char in enumerate(text):
+        if char == " ":
+            if rng.random() >= rate:
+                result.append(char)
+            continue
+
+        result.append(char)
+
+        if index == len(text) - 1:
+            continue
+
+        next_char = text[index + 1]
+
+        if next_char.isspace():
+            continue
+
+        if rng.random() < rate:
+            result.append(" ")
+
+    return "".join(result)
+
+
+def mutate_spacing(
+    text: str,
+    *,
+    rate: float = 0.02,
+    seed: int | None = None,
+) -> str:
+    """Randomly remove existing spaces or insert new spaces."""
+    _validate_rate(rate)
+
+    rng = random.Random(seed)
+
+    return _mutate_spacing(
+        text,
+        rate=rate,
+        rng=rng,
+    )
