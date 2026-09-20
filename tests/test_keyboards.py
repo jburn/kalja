@@ -1,6 +1,47 @@
 import pytest
 
-from kalja.keyboards import Key, KeyboardLayout
+from kalja.keyboards import FI_DESKTOP, Key, KeyboardLayout
+
+
+def test_fi_desktop_contains_finnish_letters() -> None:
+    for character in "åäöÅÄÖ":
+        assert character in FI_DESKTOP
+
+
+def test_fi_desktop_contains_ascii_letters() -> None:
+    for character in "abcdefghijklmnopqrstuvwxyz":
+        assert character in FI_DESKTOP
+
+
+def test_fi_desktop_f_neighbors() -> None:
+    assert FI_DESKTOP.neighbors("f") == (
+        "r",
+        "t",
+        "d",
+        "g",
+        "c",
+        "v",
+    )
+
+
+def test_fi_desktop_preserves_shift_state() -> None:
+    assert FI_DESKTOP.neighbors("F") == (
+        "R",
+        "T",
+        "D",
+        "G",
+        "C",
+        "V",
+    )
+
+
+def test_fi_desktop_finnish_letter_neighbors() -> None:
+    assert "ö" in FI_DESKTOP.neighbors("ä")
+    assert "å" in FI_DESKTOP.neighbors("ä")
+
+
+def test_fi_desktop_distant_keys_are_not_neighbors() -> None:
+    assert "q" not in FI_DESKTOP.neighbors("ä")
 
 
 def test_layout_contains_primary_and_shifted_characters() -> None:
@@ -18,6 +59,18 @@ def test_layout_contains_primary_and_shifted_characters() -> None:
     assert "B" in layout
     assert "x" not in layout
 
+def test_fi_desktop_contains_expected_characters() -> None:
+    expected = (
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "åäöÅÄÖ"
+        "0123456789"
+        "§½!\"#¤%&/()=+?"
+        "<>,.;:-_"
+    )
+
+    for character in expected:
+        assert character in FI_DESKTOP
 
 def test_key_returns_physical_key() -> None:
     key = Key("ä", "Ä", 0.0, 0.0)
