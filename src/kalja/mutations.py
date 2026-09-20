@@ -2,6 +2,7 @@ import random
 
 from .keyboards import FI_DESKTOP, KeyboardLayout
 
+
 def _validate_rate(rate: float) -> None:
     if not 0.0 <= rate <= 1.0:
         raise ValueError("Rate must be between 0.0 and 1.0")
@@ -120,6 +121,39 @@ def drop_chars(
 
     return _drop_chars(
         text=text,
+        rate=rate,
+        rng=rng,
+    )
+
+def _repeat_chars(
+    text: str,
+    *,
+    rate: float,
+    rng: random.Random,
+) -> str:
+    result: list[str] = []
+
+    for char in text:
+        result.append(char)
+
+        if rng.random() < rate:
+            result.append(char)
+
+    return "".join(result)
+
+def repeat_chars(
+    text: str,
+    *,
+    rate: float = 0.02,
+    seed: int | None = None,
+) -> str:
+    """Randomly duplicate characters in text."""
+    _validate_rate(rate)
+
+    rng = random.Random(seed)
+
+    return _repeat_chars(
+        text,
         rate=rate,
         rng=rng,
     )

@@ -1,8 +1,9 @@
-import pytest
 import random
 
-from kalja.mutations import drop_chars, keyboard_error, transpose_chars
+import pytest
+
 from kalja.keyboards import FI_DESKTOP
+from kalja.mutations import drop_chars, keyboard_error, repeat_chars, transpose_chars
 
 
 def test_keyboard_error_rate_zero_returns_original_text() -> None:
@@ -184,3 +185,67 @@ def test_drop_chars_only_removes_characters() -> None:
     iterator = iter(text)
 
     assert all(char in iterator for char in result)
+
+def test_repeat_chars_rate_zero_returns_original_text() -> None:
+    text = "Missä te olette?"
+
+    assert repeat_chars(text, rate=0.0, seed=42) == text
+
+
+def test_repeat_chars_rate_one_duplicates_every_character() -> None:
+    assert repeat_chars("kalja", rate=1.0) == "kkaalljjaa"
+
+
+def test_repeat_chars_is_deterministic_with_seed() -> None:
+    text = "abcdefghijklmnop"
+
+    first = repeat_chars(text, rate=0.5, seed=42)
+    second = repeat_chars(text, rate=0.5, seed=42)
+
+    assert first == second
+
+
+def test_repeat_chars_handles_empty_string() -> None:
+    assert repeat_chars("", rate=0.5, seed=42) == ""
+
+
+def test_repeat_chars_handles_single_character() -> None:
+    assert repeat_chars("a", rate=1.0) == "aa"
+
+
+def test_repeat_chars_handles_finnish_characters() -> None:
+    assert repeat_chars("äöå", rate=1.0) == "ääööåå"
+
+
+def test_repeat_chars_handles_unicode() -> None:
+    assert repeat_chars("🙂漢", rate=1.0) == "🙂🙂漢漢"
+
+
+def test_repeat_chars_can_duplicate_whitespace() -> None:
+    assert repeat_chars("a b", rate=1.0) == "aa  bb"
+
+
+def test_repeat_chars_can_duplicate_punctuation() -> None:
+    assert repeat_chars("a!", rate=1.0) == "aa!!"
+
+
+@pytest.mark.parametrize("rate", [-1.0, -0.01, 1.01, 2.0])
+def test_repeat_chars_rejects_invalid_rate(rate: float) -> None:
+    with pytest.raises(ValueError):
+        repeat_chars("test", rate=rate)
+
+def test_repeat_chars_only_duplicates_original_characters() -> None:
+    text = "abcdef"
+
+    result = repeat_chars(text, rate=0.5, seed=42)
+
+    index = 0
+
+    for char in text:
+        assert result[index] == char
+        index += 1
+
+        if index < len(result) and result[index] == char:
+            index += 1
+
+    assert index == len(result)
