@@ -207,3 +207,45 @@ def mutate_spacing(
         rate=rate,
         rng=rng,
     )
+
+def _mutate_casing(
+    text: str,
+    *,
+    rate: float,
+    rng: random.Random,
+) -> str:
+    result: list[str] = []
+
+    for char in text:
+        if char.lower() == char.upper():
+            result.append(char)
+            continue
+
+        if rng.random() >= rate:
+            result.append(char)
+            continue
+
+        if char.islower():
+            result.append(char.upper())
+        else:
+            result.append(char.lower())
+
+    return "".join(result)
+
+
+def mutate_casing(
+    text: str,
+    *,
+    rate: float = 0.02,
+    seed: int | None = None,
+) -> str:
+    """Randomly flip the case of alphabetic characters."""
+    _validate_rate(rate)
+
+    rng = random.Random(seed)
+
+    return _mutate_casing(
+        text,
+        rate=rate,
+        rng=rng,
+    )

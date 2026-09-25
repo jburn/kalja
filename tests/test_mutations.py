@@ -6,6 +6,7 @@ from kalja.keyboards import FI_DESKTOP
 from kalja.mutations import (
     drop_chars,
     keyboard_error,
+    mutate_casing,
     mutate_spacing,
     repeat_chars,
     transpose_chars,
@@ -302,3 +303,45 @@ def test_mutate_spacing_preserves_tabs_and_newlines() -> None:
 
     assert "\t" in result
     assert "\n" in result
+
+def test_mutate_casing_rate_zero_returns_original_text() -> None:
+    text = "Missä te OLETTE?"
+
+    assert mutate_casing(text, rate=0.0, seed=42) == text
+
+
+def test_mutate_casing_rate_one_flips_case() -> None:
+    assert mutate_casing("AbCd", rate=1.0) == "aBcD"
+
+
+def test_mutate_casing_handles_finnish_characters() -> None:
+    assert mutate_casing("äöåÄÖÅ", rate=1.0) == "ÄÖÅäöå"
+
+
+def test_mutate_casing_preserves_non_letters() -> None:
+    text = "123 !?., 🙂"
+
+    assert mutate_casing(text, rate=1.0) == text
+
+
+def test_mutate_casing_is_deterministic_with_seed() -> None:
+    text = "Missä te olette?"
+
+    first = mutate_casing(text, rate=0.5, seed=42)
+    second = mutate_casing(text, rate=0.5, seed=42)
+
+    assert first == second
+
+
+def test_mutate_casing_handles_empty_string() -> None:
+    assert mutate_casing("", rate=1.0) == ""
+
+
+def test_mutate_casing_handles_single_character() -> None:
+    assert mutate_casing("ä", rate=1.0) == "Ä"
+
+
+@pytest.mark.parametrize("rate", [-1.0, -0.01, 1.01, 2.0])
+def test_mutate_casing_rejects_invalid_rate(rate: float) -> None:
+    with pytest.raises(ValueError):
+        mutate_casing("test", rate=rate)
