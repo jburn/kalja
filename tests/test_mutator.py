@@ -116,3 +116,12 @@ def test_mutate_rejects_invalid_intensity(
 ) -> None:
     with pytest.raises(ValueError):
         mutate("test", intensity=intensity)
+
+
+def test_mutate_intensity_one_is_deterministic() -> None:
+    text = "Tämä on riittävän pitkä testilause mutaatioita varten."
+
+    first = mutate(text, intensity=1.0, seed=123)
+    second = mutate(text, intensity=1.0, seed=123)
+
+    assert first == second
