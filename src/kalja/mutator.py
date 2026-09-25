@@ -109,16 +109,14 @@ class Mutator:
         return result
 
 
-def mutate(
-    text: str,
+def _mutator_from_intensity(
+    intensity: float,
     *,
-    intensity: float = 0.5,
-    seed: int | None = None,
-) -> str:
-    """Mutate text using rates scaled by intensity."""
+    seed: int | None,
+) -> Mutator:
     _validate_intensity(intensity)
 
-    mutator = Mutator(
+    return Mutator(
         keyboard_error_rate=_MAX_KEYBOARD_ERROR_RATE * intensity,
         transposition_rate=_MAX_TRANSPOSITION_RATE * intensity,
         omission_rate=_MAX_OMISSION_RATE * intensity,
@@ -129,4 +127,40 @@ def mutate(
         seed=seed,
     )
 
+
+def mutate(
+    text: str,
+    *,
+    intensity: float = 0.5,
+    seed: int | None = None,
+) -> str:
+    """Mutate text using rates scaled by intensity."""
+    _validate_intensity(intensity)
+
+    mutator = _mutator_from_intensity(
+        intensity,
+        seed=seed,
+    )
+
     return mutator.mutate(text)
+
+
+def variants(
+    text: str,
+    *,
+    count: int = 10,
+    intensity: float = 0.5,
+    seed: int | None = None,
+) -> list[str]:
+    """Generate multiple mutated variants of text."""
+    if count < 0:
+        raise ValueError("count must be greater than or equal to zero")
+
+    _validate_intensity(intensity)
+
+    mutator = _mutator_from_intensity(
+        intensity,
+        seed=seed,
+    )
+
+    return [mutator.mutate(text) for _ in range(count)]

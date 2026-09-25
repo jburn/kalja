@@ -1,6 +1,6 @@
 import pytest
 
-from kalja.mutator import Mutator, mutate
+from kalja.mutator import Mutator, mutate, variants
 
 
 def test_mutators_with_same_seed_produce_same_sequence() -> None:
@@ -125,3 +125,88 @@ def test_mutate_intensity_one_is_deterministic() -> None:
     second = mutate(text, intensity=1.0, seed=123)
 
     assert first == second
+
+
+def test_variants_returns_requested_count() -> None:
+    result = variants(
+        "Missä te olette?",
+        count=5,
+        intensity=0.8,
+        seed=42,
+    )
+
+    assert len(result) == 5
+
+
+def test_variants_is_deterministic_with_seed() -> None:
+    text = "Tämä on riittävän pitkä testilause."
+
+    first = variants(
+        text,
+        count=10,
+        intensity=0.8,
+        seed=42,
+    )
+    second = variants(
+        text,
+        count=10,
+        intensity=0.8,
+        seed=42,
+    )
+
+    assert first == second
+
+
+def test_variants_zero_count_returns_empty_list() -> None:
+    assert (
+        variants(
+            "test",
+            count=0,
+            intensity=0.5,
+            seed=42,
+        )
+        == []
+    )
+
+
+def test_variants_intensity_zero_returns_original_text() -> None:
+    text = "Missä te olette?"
+
+    result = variants(
+        text,
+        count=5,
+        intensity=0.0,
+        seed=42,
+    )
+
+    assert result == [text] * 5
+
+
+def test_variants_handles_empty_string() -> None:
+    result = variants(
+        "",
+        count=3,
+        intensity=1.0,
+        seed=42,
+    )
+
+    assert result == ["", "", ""]
+
+
+def test_variants_rejects_negative_count() -> None:
+    with pytest.raises(ValueError):
+        variants("test", count=-1)
+
+
+@pytest.mark.parametrize(
+    "intensity",
+    [-1.0, -0.01, 1.01, 2.0],
+)
+def test_variants_rejects_invalid_intensity(
+    intensity: float,
+) -> None:
+    with pytest.raises(ValueError):
+        variants(
+            "test",
+            intensity=intensity,
+        )

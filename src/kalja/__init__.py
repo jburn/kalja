@@ -9,7 +9,7 @@ from .mutations import (
     repeat_chars,
     transpose_chars,
 )
-from .mutator import Mutator, mutate
+from .mutator import Mutator, mutate, variants
 
 __all__ = [
     "Mutator",
@@ -21,4 +21,5 @@ __all__ = [
     "mutate_spacing",
     "repeat_chars",
     "transpose_chars",
+    "variants",
 ]
