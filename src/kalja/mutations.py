@@ -1,5 +1,4 @@
 import random
-import string
 import unicodedata
 
 from .keyboards import FI_DESKTOP, KeyboardLayout
