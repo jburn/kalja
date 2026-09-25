@@ -12,6 +12,19 @@ from .mutations import (
     _validate_rate,
 )
 
+_MAX_KEYBOARD_ERROR_RATE = 0.12
+_MAX_TRANSPOSITION_RATE = 0.05
+_MAX_OMISSION_RATE = 0.04
+_MAX_REPETITION_RATE = 0.04
+_MAX_SPACING_RATE = 0.03
+_MAX_CASING_RATE = 0.02
+_MAX_PUNCTUATION_RATE = 0.03
+
+
+def _validate_intensity(intensity: float) -> None:
+    if not 0.0 <= intensity <= 1.0:
+        raise ValueError("intensity must be between 0.0 and 1.0")
+
 
 class Mutator:
     """Configurable stateful text mutator."""
@@ -94,3 +107,26 @@ class Mutator:
         )
 
         return result
+
+
+def mutate(
+    text: str,
+    *,
+    intensity: float = 0.5,
+    seed: int | None = None,
+) -> str:
+    """Mutate text using rates scaled by intensity."""
+    _validate_intensity(intensity)
+
+    mutator = Mutator(
+        keyboard_error_rate=_MAX_KEYBOARD_ERROR_RATE * intensity,
+        transposition_rate=_MAX_TRANSPOSITION_RATE * intensity,
+        omission_rate=_MAX_OMISSION_RATE * intensity,
+        repetition_rate=_MAX_REPETITION_RATE * intensity,
+        spacing_rate=_MAX_SPACING_RATE * intensity,
+        casing_rate=_MAX_CASING_RATE * intensity,
+        punctuation_rate=_MAX_PUNCTUATION_RATE * intensity,
+        seed=seed,
+    )
+
+    return mutator.mutate(text)

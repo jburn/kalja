@@ -96,6 +96,7 @@ def test_keyboard_error_does_not_change_global_random_state() -> None:
 
     assert state_after == state_before
 
+
 def test_keyboard_error_only_uses_neighboring_keys() -> None:
     text = "suomi123"
 
@@ -105,7 +106,6 @@ def test_keyboard_error_only_uses_neighboring_keys() -> None:
 
     for original, mutated in zip(text, result, strict=True):
         assert mutated in FI_DESKTOP.neighbors(original)
-
 
 
 def test_transpose_chars_rate_zero_returns_original_text() -> None:
@@ -185,6 +185,7 @@ def test_drop_chars_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         drop_chars("test", rate=rate)
 
+
 def test_drop_chars_only_removes_characters() -> None:
     text = "abcdef"
 
@@ -193,6 +194,7 @@ def test_drop_chars_only_removes_characters() -> None:
     iterator = iter(text)
 
     assert all(char in iterator for char in result)
+
 
 def test_repeat_chars_rate_zero_returns_original_text() -> None:
     text = "Missä te olette?"
@@ -242,6 +244,7 @@ def test_repeat_chars_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         repeat_chars("test", rate=rate)
 
+
 def test_repeat_chars_only_duplicates_original_characters() -> None:
     text = "abcdef"
 
@@ -257,6 +260,7 @@ def test_repeat_chars_only_duplicates_original_characters() -> None:
             index += 1
 
     assert index == len(result)
+
 
 def test_mutate_spacing_rate_zero_returns_original_text() -> None:
     text = "Missä te olette?"
@@ -276,8 +280,10 @@ def test_mutate_spacing_is_deterministic_with_seed() -> None:
 def test_mutate_spacing_rate_one_removes_existing_spaces() -> None:
     assert mutate_spacing("a b", rate=1.0) == "ab"
 
+
 def test_mutate_spacing_rate_one_inserts_between_characters() -> None:
     assert mutate_spacing("abc", rate=1.0) == "a b c"
+
 
 def test_mutate_spacing_handles_empty_string() -> None:
     assert mutate_spacing("", rate=1.0) == ""
@@ -292,10 +298,12 @@ def test_mutate_spacing_does_not_add_trailing_space() -> None:
 
     assert not result.endswith(" ")
 
+
 @pytest.mark.parametrize("rate", [-1.0, -0.01, 1.01, 2.0])
 def test_mutate_spacing_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         mutate_spacing("test", rate=rate)
+
 
 def test_mutate_spacing_preserves_tabs_and_newlines() -> None:
     text = "a\tb\nc"
@@ -304,6 +312,7 @@ def test_mutate_spacing_preserves_tabs_and_newlines() -> None:
 
     assert "\t" in result
     assert "\n" in result
+
 
 def test_mutate_casing_rate_zero_returns_original_text() -> None:
     text = "Missä te OLETTE?"
@@ -347,6 +356,7 @@ def test_mutate_casing_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         mutate_casing("test", rate=rate)
 
+
 def test_mutate_punctuation_rate_zero_returns_original_text() -> None:
     text = "Hei, mitä kuuluu?"
 
@@ -386,6 +396,7 @@ def test_mutate_punctuation_preserves_letters_and_spaces() -> None:
 def test_mutate_punctuation_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         mutate_punctuation("Hei!", rate=rate)
+
 
 def test_mutate_punctuation_only_omits_or_duplicates() -> None:
     result = mutate_punctuation("!", rate=1.0, seed=42)

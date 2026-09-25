@@ -40,9 +40,7 @@ class KeyboardLayout:
 
             for character in (key.primary, key.shifted):
                 if character in by_character:
-                    raise ValueError(
-                        f"Duplicate keyboard character: {character!r}"
-                    )
+                    raise ValueError(f"Duplicate keyboard character: {character!r}")
 
                 by_character[character] = key
 
@@ -99,6 +97,7 @@ class KeyboardLayout:
             for neighbor in self.neighboring_keys(character)
         )
 
+
 FI_DESKTOP = KeyboardLayout(
     "fi-desktop",
     (
@@ -116,7 +115,6 @@ FI_DESKTOP = KeyboardLayout(
         Key("0", "=", 9.00, -1.0),
         Key("+", "?", 10.00, -1.0),
         Key("´", "`", 11.00, -1.0),
-
         # QWERTY row
         Key("q", "Q", 0.25, 0.0),
         Key("w", "W", 1.25, 0.0),
@@ -130,7 +128,6 @@ FI_DESKTOP = KeyboardLayout(
         Key("p", "P", 9.25, 0.0),
         Key("å", "Å", 10.25, 0.0),
         Key("¨", "^", 11.25, 0.0),
-
         # Home row
         Key("a", "A", 0.50, 1.0),
         Key("s", "S", 1.50, 1.0),
@@ -144,7 +141,6 @@ FI_DESKTOP = KeyboardLayout(
         Key("ö", "Ö", 9.50, 1.0),
         Key("ä", "Ä", 10.50, 1.0),
         Key("'", "*", 11.50, 1.0),
-
         # Bottom row
         Key("<", ">", 0.25, 2.0),
         Key("z", "Z", 1.25, 2.0),

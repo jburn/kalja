@@ -8,12 +8,13 @@ def _validate_rate(rate: float) -> None:
     if not 0.0 <= rate <= 1.0:
         raise ValueError("Rate must be between 0.0 and 1.0")
 
+
 def _keyboard_error(
-        text: str,
-        *,
-        rate: float,
-        layout: KeyboardLayout,
-        rng: random.Random,
+    text: str,
+    *,
+    rate: float,
+    layout: KeyboardLayout,
+    rng: random.Random,
 ) -> str:
     result: list[str] = []
 
@@ -36,12 +37,13 @@ def _keyboard_error(
 
     return "".join(result)
 
+
 def keyboard_error(
-        text: str,
-        *,
-        rate: float = 0.05,
-        seed: int | None = None,
-        layout: KeyboardLayout = FI_DESKTOP,
+    text: str,
+    *,
+    rate: float = 0.05,
+    seed: int | None = None,
+    layout: KeyboardLayout = FI_DESKTOP,
 ) -> str:
     """Introduce neighbouring-key substitutions into text."""
     _validate_rate(rate)
@@ -54,6 +56,7 @@ def keyboard_error(
         layout=layout,
         rng=rng,
     )
+
 
 def _transpose_chars(
     text: str,
@@ -76,6 +79,7 @@ def _transpose_chars(
 
     return "".join(chars)
 
+
 def transpose_chars(
     text: str,
     *,
@@ -93,6 +97,7 @@ def transpose_chars(
         rng=rng,
     )
 
+
 def _drop_chars(
     text: str,
     *,
@@ -108,6 +113,7 @@ def _drop_chars(
         result.append(char)
 
     return "".join(result)
+
 
 def drop_chars(
     text: str,
@@ -126,6 +132,7 @@ def drop_chars(
         rng=rng,
     )
 
+
 def _repeat_chars(
     text: str,
     *,
@@ -141,6 +148,7 @@ def _repeat_chars(
             result.append(char)
 
     return "".join(result)
+
 
 def repeat_chars(
     text: str,
@@ -158,6 +166,7 @@ def repeat_chars(
         rate=rate,
         rng=rng,
     )
+
 
 def _mutate_spacing(
     text: str,
@@ -209,6 +218,7 @@ def mutate_spacing(
         rng=rng,
     )
 
+
 def _mutate_casing(
     text: str,
     *,
@@ -251,8 +261,10 @@ def mutate_casing(
         rng=rng,
     )
 
+
 def _is_punctuation(char: str) -> bool:
     return unicodedata.category(char).startswith("P")
+
 
 def _mutate_punctuation(
     text: str,

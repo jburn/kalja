@@ -59,18 +59,20 @@ def test_layout_contains_primary_and_shifted_characters() -> None:
     assert "B" in layout
     assert "x" not in layout
 
+
 def test_fi_desktop_contains_expected_characters() -> None:
     expected = (
         "abcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "åäöÅÄÖ"
         "0123456789"
-        "§½!\"#¤%&/()=+?"
+        '§½!"#¤%&/()=+?'
         "<>,.;:-_"
     )
 
     for character in expected:
         assert character in FI_DESKTOP
+
 
 def test_key_returns_physical_key() -> None:
     key = Key("ä", "Ä", 0.0, 0.0)
