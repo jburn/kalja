@@ -27,6 +27,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.scripts]
+kalja = "kalja.cli:main"
+
 [project.urls]
 Repository = "https://github.com/jburn/kalja"
 Issues = "https://github.com/jburn/kalja/issues"
