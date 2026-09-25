@@ -1,4 +1,6 @@
 import random
+import string
+import unicodedata
 
 from .keyboards import FI_DESKTOP, KeyboardLayout
 
@@ -245,6 +247,51 @@ def mutate_casing(
     rng = random.Random(seed)
 
     return _mutate_casing(
+        text,
+        rate=rate,
+        rng=rng,
+    )
+
+def _is_punctuation(char: str) -> bool:
+    return unicodedata.category(char).startswith("P")
+
+def _mutate_punctuation(
+    text: str,
+    *,
+    rate: float,
+    rng: random.Random,
+) -> str:
+    result: list[str] = []
+
+    for char in text:
+        if not _is_punctuation(char):
+            result.append(char)
+            continue
+
+        if rng.random() >= rate:
+            result.append(char)
+            continue
+
+        if rng.random() < 0.5:
+            continue
+
+        result.extend((char, char))
+
+    return "".join(result)
+
+
+def mutate_punctuation(
+    text: str,
+    *,
+    rate: float = 0.02,
+    seed: int | None = None,
+) -> str:
+    """Randomly omit or duplicate existing punctuation."""
+    _validate_rate(rate)
+
+    rng = random.Random(seed)
+
+    return _mutate_punctuation(
         text,
         rate=rate,
         rng=rng,

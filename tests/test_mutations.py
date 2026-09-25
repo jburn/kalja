@@ -7,6 +7,7 @@ from kalja.mutations import (
     drop_chars,
     keyboard_error,
     mutate_casing,
+    mutate_punctuation,
     mutate_spacing,
     repeat_chars,
     transpose_chars,
@@ -345,3 +346,48 @@ def test_mutate_casing_handles_single_character() -> None:
 def test_mutate_casing_rejects_invalid_rate(rate: float) -> None:
     with pytest.raises(ValueError):
         mutate_casing("test", rate=rate)
+
+def test_mutate_punctuation_rate_zero_returns_original_text() -> None:
+    text = "Hei, mitä kuuluu?"
+
+    assert mutate_punctuation(text, rate=0.0, seed=42) == text
+
+
+def test_mutate_punctuation_preserves_non_punctuation() -> None:
+    text = "Missä te olette"
+
+    assert mutate_punctuation(text, rate=1.0, seed=42) == text
+
+
+def test_mutate_punctuation_is_deterministic_with_seed() -> None:
+    text = "Hei, mitä kuuluu?!..."
+
+    first = mutate_punctuation(text, rate=0.8, seed=42)
+    second = mutate_punctuation(text, rate=0.8, seed=42)
+
+    assert first == second
+
+
+def test_mutate_punctuation_handles_empty_string() -> None:
+    assert mutate_punctuation("", rate=1.0, seed=42) == ""
+
+
+def test_mutate_punctuation_preserves_letters_and_spaces() -> None:
+    text = "Hei, maailma!"
+
+    result = mutate_punctuation(text, rate=1.0, seed=42)
+
+    without_punctuation = result.replace(",", "").replace("!", "")
+
+    assert without_punctuation == "Hei maailma"
+
+
+@pytest.mark.parametrize("rate", [-1.0, -0.01, 1.01, 2.0])
+def test_mutate_punctuation_rejects_invalid_rate(rate: float) -> None:
+    with pytest.raises(ValueError):
+        mutate_punctuation("Hei!", rate=rate)
+
+def test_mutate_punctuation_only_omits_or_duplicates() -> None:
+    result = mutate_punctuation("!", rate=1.0, seed=42)
+
+    assert result in ("", "!!")
