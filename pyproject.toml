@@ -40,6 +40,7 @@ packages = ["src/kalja"]
 [tool.hatch.build.targets.sdist]
 exclude = [
     "/.github",
+    "/.gitignore",
     "/uv.lock",
 ]
 

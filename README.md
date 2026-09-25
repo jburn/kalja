@@ -1,10 +1,10 @@
-# KALJA
+# kalja
 
-KALJA is a small, dependency-free Python library for text mutation and human-input fuzzing.
+kalja is a small, dependency-free Python library for text mutation and human-input fuzzing.
 
 It generates deliberately imperfect text for testing systems such as search, fuzzy matching, forms, parsers, typo correction, normalization, and NLP pipelines.
 
-KALJA provides Finnish-focused defaults, including a Finnish desktop keyboard layout, while also supporting US QWERTY and custom keyboard layouts.
+kalja provides Finnish-focused defaults, including a Finnish desktop keyboard layout, while also supporting US QWERTY and custom keyboard layouts.
 
 ## Installation
 
@@ -12,7 +12,7 @@ KALJA provides Finnish-focused defaults, including a Finnish desktop keyboard la
 pip install kalja
 ```
 
-KALJA requires Python 3.10 or later.
+kalja requires Python 3.10 or later.
 
 ## Quick start
 
@@ -82,19 +82,19 @@ kalja.mutate(text, intensity=1.0)
 
 Intensity is a **relative fuzzing level**, not a direct probability.
 
-Internally, KALJA scales the configured mutation rates:
+Internally, kalja scales the configured mutation rates:
 
 ```text
 effective rate = maximum rate × intensity
 ```
 
-This means `intensity=1.0` enables KALJA's full configured mutation rates. It does not mean that every character will be mutated.
+This means `intensity=1.0` enables kalja's full configured mutation rates. It does not mean that every character will be mutated.
 
 At `intensity=0.0`, all mutation rates are zero and the original text is returned unchanged.
 
 ## Keyboard layouts
 
-KALJA includes Finnish and US desktop keyboard layouts.
+kalja includes Finnish and US desktop keyboard layouts.
 
 Finnish desktop is the default:
 
@@ -129,7 +129,7 @@ Keyboard coordinates are approximate and are intended for neighboring-key mutati
 
 ## Low-level mutations
 
-KALJA also exposes individual mutation operations when precise control is needed.
+kalja also exposes individual mutation operations when precise control is needed.
 
 ### Keyboard errors
 
@@ -279,11 +279,11 @@ The two results may differ.
 
 Recreating a `Mutator` with the same configuration and seed reproduces the same sequence of results.
 
-KALJA does not modify Python's process-global `random` state.
+kalja does not modify Python's process-global `random` state.
 
 ## Command-line interface
 
-KALJA includes a command-line interface.
+kalja includes a command-line interface.
 
 Mutate text directly:
 
@@ -321,7 +321,7 @@ The Finnish layout is the default:
 kalja --layout fi "Missä te olette?"
 ```
 
-KALJA can also read text from standard input:
+kalja can also read text from standard input:
 
 ```bash
 echo "Missä te olette?" | kalja --intensity 0.7 --seed 42
@@ -335,7 +335,7 @@ kalja --help
 
 ## Use cases
 
-KALJA can be used to generate imperfect inputs for testing:
+kalja can be used to generate imperfect inputs for testing:
 
 - search and autocomplete
 - fuzzy matching
@@ -366,7 +366,7 @@ for query in queries:
 
 ## Unicode and Finnish text
 
-KALJA works with Python Unicode strings and supports Finnish characters such as:
+kalja works with Python Unicode strings and supports Finnish characters such as:
 
 ```text
 ä ö å Ä Ö Å
@@ -374,11 +374,11 @@ KALJA works with Python Unicode strings and supports Finnish characters such as:
 
 The Finnish desktop layout includes these characters when generating neighboring-key substitutions.
 
-KALJA currently operates on Python string characters rather than Unicode grapheme clusters. Combining character sequences may therefore be treated as multiple mutation units.
+kalja currently operates on Python string characters rather than Unicode grapheme clusters. Combining character sequences may therefore be treated as multiple mutation units.
 
 ## Limitations
 
-KALJA is a mechanical text mutation and fuzzing library. It is not a linguistic model of how people make mistakes.
+kalja is a mechanical text mutation and fuzzing library. It is not a linguistic model of how people make mistakes.
 
 In particular:
 
@@ -391,7 +391,7 @@ In particular:
 - generated mutations are not guaranteed to represent realistic human errors
 - generated variants are not guaranteed to be unique
 
-These constraints are intentional: KALJA aims to provide small, deterministic, understandable mutation primitives suitable for testing.
+These constraints are intentional: kalja aims to provide small, deterministic, understandable mutation primitives suitable for testing.
 
 ## Development
 
@@ -433,4 +433,4 @@ uv run pytest --cov=kalja --cov-report=term-missing
 
 ## License
 
-KALJA is licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later). See the LICENSE file for details.
+kalja is licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later). See the LICENSE file for details.
