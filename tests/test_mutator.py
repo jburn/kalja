@@ -1,5 +1,6 @@
 import pytest
 
+from kalja.keyboards import US_DESKTOP
 from kalja.mutator import Mutator, mutate, variants
 
 
@@ -210,3 +211,26 @@ def test_variants_rejects_invalid_intensity(
             "test",
             intensity=intensity,
         )
+
+
+def test_mutate_accepts_us_desktop_layout() -> None:
+    result = mutate(
+        "hello world",
+        intensity=1.0,
+        layout=US_DESKTOP,
+        seed=42,
+    )
+
+    assert isinstance(result, str)
+
+
+def test_variants_accepts_us_desktop_layout() -> None:
+    result = variants(
+        "hello world",
+        count=5,
+        intensity=1.0,
+        layout=US_DESKTOP,
+        seed=42,
+    )
+
+    assert len(result) == 5

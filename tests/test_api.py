@@ -1,10 +1,13 @@
 import random
+
 import kalja
 
 
 def test_public_api() -> None:
     assert kalja.__all__ == [
+        "FI_DESKTOP",
         "Mutator",
+        "US_DESKTOP",
         "drop_chars",
         "keyboard_error",
         "mutate",

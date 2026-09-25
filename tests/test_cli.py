@@ -1,7 +1,7 @@
 import io
-import pytest
 import sys
 
+import pytest
 
 from kalja.cli import main
 
@@ -80,6 +80,76 @@ def test_cli_rejects_negative_count() -> None:
                 "--count",
                 "-1",
                 "kalja",
+            ]
+        )
+
+    assert exc_info.value.code == 2
+
+
+def test_cli_accepts_minimum_intensity(capsys) -> None:
+    assert main(["--intensity", "0", "kalja"]) == 0
+    assert capsys.readouterr().out == "kalja\n"
+
+
+def test_cli_accepts_maximum_intensity() -> None:
+    assert main(["--intensity", "1", "--seed", "42", "kalja"]) == 0
+
+
+def test_cli_rejects_intensity_above_one() -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--intensity", "1.01", "kalja"])
+
+    assert exc_info.value.code == 2
+
+
+def test_cli_rejects_zero_count() -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--count", "0", "kalja"])
+
+    assert exc_info.value.code == 2
+
+
+def test_cli_accepts_finnish_layout(capsys) -> None:
+    exit_code = main(
+        [
+            "--layout",
+            "fi",
+            "--intensity",
+            "0",
+            "kalja",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert captured.out == "kalja\n"
+
+
+def test_cli_accepts_us_layout(capsys) -> None:
+    exit_code = main(
+        [
+            "--layout",
+            "us",
+            "--intensity",
+            "0",
+            "hello",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert captured.out == "hello\n"
+
+
+def test_cli_rejects_unknown_layout() -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(
+            [
+                "--layout",
+                "de",
+                "hello",
             ]
         )
 

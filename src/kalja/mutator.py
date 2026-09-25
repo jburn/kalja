@@ -112,6 +112,7 @@ class Mutator:
 def _mutator_from_intensity(
     intensity: float,
     *,
+    layout: KeyboardLayout,
     seed: int | None,
 ) -> Mutator:
     _validate_intensity(intensity)
@@ -124,6 +125,7 @@ def _mutator_from_intensity(
         spacing_rate=_MAX_SPACING_RATE * intensity,
         casing_rate=_MAX_CASING_RATE * intensity,
         punctuation_rate=_MAX_PUNCTUATION_RATE * intensity,
+        layout=layout,
         seed=seed,
     )
 
@@ -132,6 +134,7 @@ def mutate(
     text: str,
     *,
     intensity: float = 0.5,
+    layout: KeyboardLayout = FI_DESKTOP,
     seed: int | None = None,
 ) -> str:
     """Mutate text using rates scaled by intensity."""
@@ -139,6 +142,7 @@ def mutate(
 
     mutator = _mutator_from_intensity(
         intensity,
+        layout=layout,
         seed=seed,
     )
 
@@ -150,6 +154,7 @@ def variants(
     *,
     count: int = 10,
     intensity: float = 0.5,
+    layout: KeyboardLayout = FI_DESKTOP,
     seed: int | None = None,
 ) -> list[str]:
     """Generate multiple mutated variants of text."""
@@ -160,6 +165,7 @@ def variants(
 
     mutator = _mutator_from_intensity(
         intensity,
+        layout=layout,
         seed=seed,
     )
 

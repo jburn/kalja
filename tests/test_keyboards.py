@@ -1,6 +1,6 @@
 import pytest
 
-from kalja.keyboards import FI_DESKTOP, Key, KeyboardLayout
+from kalja.keyboards import FI_DESKTOP, US_DESKTOP, Key, KeyboardLayout
 
 
 def test_fi_desktop_contains_finnish_letters() -> None:
@@ -248,3 +248,63 @@ def test_layout_properties() -> None:
     assert layout.name == "test"
     assert layout.keys == keys
     assert layout.neighbor_radius == 1.25
+
+
+def test_us_desktop_contains_ascii_letters() -> None:
+    for char in "abcdefghijklmnopqrstuvwxyz":
+        assert char in US_DESKTOP
+
+    for char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        assert char in US_DESKTOP
+
+
+def test_us_desktop_contains_digits() -> None:
+    for char in "0123456789":
+        assert char in US_DESKTOP
+
+
+def test_us_desktop_contains_us_punctuation() -> None:
+    for char in "`~!@#$%^&*()-_=+[]{}\\|;:'\",<.>/?":
+        assert char in US_DESKTOP
+
+
+def test_us_desktop_does_not_contain_finnish_letters() -> None:
+    for char in "äöåÄÖÅ":
+        assert char not in US_DESKTOP
+
+
+def test_us_desktop_has_expected_neighbors() -> None:
+    neighbors = US_DESKTOP.neighbors("f")
+
+    assert "r" in neighbors
+    assert "t" in neighbors
+    assert "d" in neighbors
+    assert "g" in neighbors
+    assert "c" in neighbors
+    assert "v" in neighbors
+
+
+def test_us_desktop_preserves_shift_state() -> None:
+    neighbors = US_DESKTOP.neighbors("F")
+
+    assert "R" in neighbors
+    assert "T" in neighbors
+    assert "D" in neighbors
+    assert "G" in neighbors
+    assert "C" in neighbors
+    assert "V" in neighbors
+
+
+def test_us_desktop_name() -> None:
+    assert US_DESKTOP.name == "us-desktop"
+
+
+def test_finnish_and_us_desktop_have_different_number_row() -> None:
+    assert FI_DESKTOP.key("2").shifted == '"'
+    assert US_DESKTOP.key("2").shifted == "@"
+
+    assert FI_DESKTOP.key("6").shifted == "&"
+    assert US_DESKTOP.key("6").shifted == "^"
+
+    assert FI_DESKTOP.key("7").shifted == "/"
+    assert US_DESKTOP.key("7").shifted == "&"

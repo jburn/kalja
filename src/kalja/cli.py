@@ -2,7 +2,31 @@ import argparse
 import sys
 from collections.abc import Sequence
 
+from .keyboards import FI_DESKTOP, US_DESKTOP, KeyboardLayout
 from .mutator import mutate, variants
+
+_LAYOUTS: dict[str, KeyboardLayout] = {
+    "fi": FI_DESKTOP,
+    "us": US_DESKTOP,
+}
+
+
+def _positive_int(value: str) -> int:
+    parsed = int(value)
+
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be greater than or equal to 1")
+
+    return parsed
+
+
+def _intensity(value: str) -> float:
+    parsed = float(value)
+
+    if not 0.0 <= parsed <= 1.0:
+        raise argparse.ArgumentTypeError("must be between 0.0 and 1.0")
+
+    return parsed
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -17,9 +41,16 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Text to mutate. Reads from stdin when omitted.",
     )
     parser.add_argument(
+        "-l",
+        "--layout",
+        choices=_LAYOUTS,
+        default="fi",
+        help="Keyboard layout for keyboard errors (default: fi).",
+    )
+    parser.add_argument(
         "-i",
         "--intensity",
-        type=float,
+        type=_intensity,
         default=0.5,
         help="Mutation intensity from 0.0 to 1.0 (default: 0.5).",
     )
@@ -33,7 +64,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-n",
         "--count",
-        type=int,
+        type=_positive_int,
         default=1,
         help="Number of variants to generate (default: 1).",
     )
@@ -46,6 +77,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     text = args.text
+    layout = _LAYOUTS[args.layout]
 
     if text is None:
         text = sys.stdin.read()
@@ -56,6 +88,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 mutate(
                     text,
                     intensity=args.intensity,
+                    layout=layout,
                     seed=args.seed,
                 )
             )
@@ -64,6 +97,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 text,
                 count=args.count,
                 intensity=args.intensity,
+                layout=layout,
                 seed=args.seed,
             )
 
